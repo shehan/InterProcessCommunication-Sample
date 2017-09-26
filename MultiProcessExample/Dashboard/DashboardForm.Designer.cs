@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.buttonLaunch = new System.Windows.Forms.Button();
-            this.textBoxHeartbeatLog = new System.Windows.Forms.TextBox();
             this.buttonTerminate = new System.Windows.Forms.Button();
+            this.textBoxHeartbeatLog = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // buttonLaunch
@@ -43,16 +43,6 @@
             this.buttonLaunch.UseVisualStyleBackColor = true;
             this.buttonLaunch.Click += new System.EventHandler(this.buttonLaunch_Click);
             // 
-            // textBoxHeartbeatLog
-            // 
-            this.textBoxHeartbeatLog.Location = new System.Drawing.Point(12, 46);
-            this.textBoxHeartbeatLog.Multiline = true;
-            this.textBoxHeartbeatLog.Name = "textBoxHeartbeatLog";
-            this.textBoxHeartbeatLog.ReadOnly = true;
-            this.textBoxHeartbeatLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBoxHeartbeatLog.Size = new System.Drawing.Size(342, 229);
-            this.textBoxHeartbeatLog.TabIndex = 2;
-            // 
             // buttonTerminate
             // 
             this.buttonTerminate.Location = new System.Drawing.Point(12, 290);
@@ -63,27 +53,36 @@
             this.buttonTerminate.UseVisualStyleBackColor = true;
             this.buttonTerminate.Click += new System.EventHandler(this.buttonTerminate_Click);
             // 
+            // textBoxHeartbeatLog
+            // 
+            this.textBoxHeartbeatLog.Location = new System.Drawing.Point(12, 41);
+            this.textBoxHeartbeatLog.Name = "textBoxHeartbeatLog";
+            this.textBoxHeartbeatLog.ReadOnly = true;
+            this.textBoxHeartbeatLog.Size = new System.Drawing.Size(342, 243);
+            this.textBoxHeartbeatLog.TabIndex = 4;
+            this.textBoxHeartbeatLog.Text = "";
+            // 
             // DashboardForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(385, 350);
-            this.Controls.Add(this.buttonTerminate);
+            this.ClientSize = new System.Drawing.Size(366, 325);
             this.Controls.Add(this.textBoxHeartbeatLog);
+            this.Controls.Add(this.buttonTerminate);
             this.Controls.Add(this.buttonLaunch);
             this.Name = "DashboardForm";
             this.Text = "Dashboard";
+            this.TopMost = true;
             this.Load += new System.EventHandler(this.DashboardForm_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.Button buttonLaunch;
-        private System.Windows.Forms.TextBox textBoxHeartbeatLog;
         private System.Windows.Forms.Button buttonTerminate;
+        private System.Windows.Forms.RichTextBox textBoxHeartbeatLog;
     }
 }
 
