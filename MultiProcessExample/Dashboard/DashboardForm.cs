@@ -11,6 +11,7 @@ namespace Dashboard
     public partial class DashboardForm : Form
     {
         private List<Process> _processList;
+        private Dictionary<string, bool> _modules;
 
         public DashboardForm()
         {
@@ -19,27 +20,35 @@ namespace Dashboard
 
         private void DashboardForm_Load(object sender, EventArgs e)
         {
-            labelTime.Text = DateTime.Now.ToShortDateString();
             _processList = new List<Process>();
+            _modules = new Dictionary<string, bool>();
         }
 
         private void buttonLaunch_Click(object sender, EventArgs e)
         {
             string[] modules = {@"Modules\ModuleA", @"Modules\ModuleB", @"Modules\ModuleC"};
-            //string[] modules = { @"Modules\ModuleA" };
+                     
 
             foreach (var p in modules)
             {
-                var processStartInfo = new ProcessStartInfo();
-                processStartInfo.FileName = p;
-                processStartInfo.Arguments = Process.GetCurrentProcess().Id.ToString();
+                //Create pipe
+                var pipedServerThread = new Thread(StartServerListner);
+                pipedServerThread.Start();
+
+                //Launch modules as child processes
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = p,
+                    Arguments = Process.GetCurrentProcess().Id.ToString()
+                };
                 var process = Process.Start(processStartInfo);
+
                 _processList.Add(process);
-                textBoxProcess.Text = textBoxProcess.Text + Environment.NewLine + p + " : " + process.Id;
+
+                UpdateLog($"Process spawned: {p} (Id: {process.Id})");
             }
 
-            var RecieverThread = new Thread(StartServerListner);
-            RecieverThread.Start();
+
         }
 
         private void buttonTerminate_Click(object sender, EventArgs e)
@@ -49,13 +58,16 @@ namespace Dashboard
                     process.Kill();
 
             _processList = new List<Process>();
+            _modules = new Dictionary<string, bool>();
         }
-
 
         private void StartServerListner()
         {
-            using (var pipeStream = new NamedPipeServerStream("PipeTo" + Process.GetCurrentProcess().Id))
+            string module=string.Empty;
+            using (var pipeStream =
+                new NamedPipeServerStream("PipeTo" + Process.GetCurrentProcess().Id, PipeDirection.InOut, 10))
             {
+
                 Console.WriteLine("[Server] Pipe Created, the current process ID is {0}",
                     Process.GetCurrentProcess().Id);
 
@@ -68,10 +80,36 @@ namespace Dashboard
                     string message;
                     //wait for message to arrive from the pipe, when message arrive print date/time and the message to the console.
                     while ((message = sr.ReadLine()) != null)
+                    {
+                        module = message.Split(';')[0];
+                        if (!_modules.ContainsKey(module))
+                        {
+                            _modules.Add(module,true);
+                            UpdateLog("Connection Established: " + module);
+                        }
+                    }
                         Console.WriteLine("{0}: {1}", DateTime.Now, message);
                 }
             }
-            Console.WriteLine("Connection lost");
+
+            UpdateLog("Connection Lost: " + module);
+
         }
+
+        private void UpdateLog(string text)
+        {
+            if (this.textBoxHeartbeatLog.InvokeRequired)
+            {
+                UpdateLogCallback callback = new UpdateLogCallback(UpdateLog);
+                this.Invoke(callback, new object[] { text });
+            }
+            else
+            {
+                textBoxHeartbeatLog.Text = textBoxHeartbeatLog.Text + Environment.NewLine + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + " " + text;
+            }
+        }
+
+        delegate void UpdateLogCallback(string text);
+
     }
 }
